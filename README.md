@@ -195,6 +195,30 @@ Authorization: Bearer <your_token>
 
 ---
 
+### **7. Download Borrow History as CSV**
+- **Endpoint**: `/download-history`
+- **Method**: `GET`
+- **Description**: Allows a user to download their borrowing history as a CSV file.
+- **Authorization**: Required.
+
+#### Response:
+- **200 OK**: CSV file download starts.
+
+#### Example Response File (CSV):
+```
+Borrow ID,Book Title,Start Date,End Date,Status
+1,Book Title,2024-12-15,2024-12-20,Approved
+2,Another Book,2024-12-25,2024-12-30,Pending
+```
+- **401 Unauthorized**:
+```json
+{
+  "message": "Unauthorized access"
+}
+```
+
+---
+
 ## **Error Codes**
 - **400**: Bad Request (e.g., invalid or missing parameters).
 - **401**: Unauthorized (e.g., missing or invalid JWT token).
