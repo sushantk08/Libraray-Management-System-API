@@ -1,9 +1,12 @@
+import csv
 import os
-from flask import Flask, request, jsonify
+import io
+from flask import Flask, make_response, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
+
 
 # Initialize Flask App
 app = Flask(__name__)
@@ -147,6 +150,22 @@ def approve_or_deny_request(request_id):
     borrow_request.status = status
     db.session.commit()
     return jsonify({'message': 'Request updated successfully'}), 200
+
+@app.route('/download-history', methods=['GET'])
+@jwt_required()
+def download_history():
+    current_user = get_jwt_identity()
+    borrow_requests = BorrowRequest.query.filter_by(user_id=current_user['id']).all()
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['Borrow ID', 'Book Title', 'Start Date', 'End Date', 'Status'])
+    for request in borrow_requests:
+        book = Book.query.get(request.book_id)
+        writer.writerow([request.id, book.title, request.start_date, request.end_date, request.status])
+    response = make_response(output.getvalue())
+    response.headers['Content-Disposition'] = 'attachment; filename=borrow_history.csv'
+    response.headers['Content-Type'] = 'text/csv'
+    return response
 
 if __name__ == '__main__':
     with app.app_context():
