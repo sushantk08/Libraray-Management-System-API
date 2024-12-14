@@ -211,5 +211,4 @@ Authorization: Bearer <your_token>
 
 ---
 
-For further assistance, contact the development team.
 
